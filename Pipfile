@@ -8,6 +8,8 @@ pandas = "*"
 openpyxl = "*"
 pysimplegui = "*"
 pyinstaller = "*"
+sqlalchemy = "*"
+excel2json-3 = "*"
 
 [dev-packages]
 
