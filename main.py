@@ -32,7 +32,7 @@ rankit = ['Silver I','Silver II', 'Silver III','Silver IV','Silver V','Gold I','
 
 def alkuIkkuna():  
     alku = [
-        [sg.Button('Uusi pelaaja'),sg.Button('CB'),sg.Button('Pelaajat')]
+        [sg.Button('Uusi datapointti'),sg.Button('CB'),sg.Button('Pelaajat')]
     ]
     return sg.Window('Mäyristen juhladatasovellus', alku, finalize=True, resizable=True,margins=(65,10))
 
@@ -40,7 +40,7 @@ def uusiDataPointtiIkkuna():
     uusiDataPointti = [
         [sg.Text('Tähän muhlun data:')],
         [sg.Text('Nimi', size=(15,1)), sg.InputText(key='Nimi')],
-        [sg.Text('Player power', size=(15,1)), sg.InputText(key='Player power', size=(10))],
+        [sg.Text('Player power (M)', size=(15,1)), sg.InputText(key='Player power', size=(10))],
         [sg.Text('Clan XP', size=(15,1)), sg.InputText(key='Clan XP', size=(10))],
         [sg.Text('Arena rankki', size=(15,1)), sg.Combo(rankit, key='Arena rankki')],
         [sg.Text('Pvm', size=(15,1)), sg.InputText(today.strftime('%d/%m/%Y'),key='Pvm',disabled=True, size=(10))],
@@ -94,7 +94,7 @@ while True:
     if event1 == sg.WIN_CLOSED or event1 == 'Exit':
         break
 
-    if event1 == 'Uusi pelaaja':
+    if event1 == 'Uusi datapointti':
         UDP = uusiDataPointtiIkkuna()
         while True:
             
