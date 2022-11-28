@@ -16,6 +16,7 @@ with open(JSON_FILE) as json_file:
             continue
         pelaajat.append(x['Nimi'])
     json_file.close()
+pelaajat.sort()
 
 pvms = []
 with open(JSON_FILE) as json_file:
@@ -24,6 +25,7 @@ with open(JSON_FILE) as json_file:
             continue
         pvms.append(x['Pvm'])
     json_file.close()
+pvms.sort()
 
 print(pelaajat, pvms)
 
