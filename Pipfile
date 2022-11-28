@@ -10,6 +10,7 @@ pysimplegui = "*"
 pyinstaller = "*"
 sqlalchemy = "*"
 excel2json-3 = "*"
+pytesseract = "*"
 
 [dev-packages]
 
