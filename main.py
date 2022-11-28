@@ -7,25 +7,25 @@ sg.theme('DarkPurple1')
 
 today = date.today()
 
-EXCEL_FILE = r'C:\Users\hauta\Desktop\raid\Data.xlsx'
-
-df = pd.read_excel(EXCEL_FILE, sheet_name='Klaani')
-jsonData = df.to_json()
-
-print (jsonData)
+JSON_FILE = 'Data.json'
 
 pelaajat = []
-for x in pd.read_excel(EXCEL_FILE, sheet_name='Klaani').Nimi:
-    if pelaajat.__contains__(x):
-        continue
-    pelaajat.append(x)
+with open(JSON_FILE) as json_file:
+    for x in json.load(json_file)['Klaani']:
+        if pelaajat.__contains__(x['Nimi']):
+            continue
+        pelaajat.append(x['Nimi'])
+    json_file.close()
 
 pvms = []
-for x in pd.read_excel(EXCEL_FILE, sheet_name='Klaani').Pvm:
-    if pvms.__contains__(x):
-        continue
-    pvms.append(x)
+with open(JSON_FILE) as json_file:
+    for x in json.load(json_file)['Klaani']:
+        if pvms.__contains__(x['Pvm']):
+            continue
+        pvms.append(x['Pvm'])
+    json_file.close()
 
+print(pelaajat, pvms)
 
 rankit = ['Silver I','Silver II', 'Silver III','Silver IV','Silver V','Gold I','Gold II','Gold III','Gold IV','Gold V','Platina']
 
@@ -40,7 +40,7 @@ def uusiDataPointtiIkkuna():
     uusiDataPointti = [
         [sg.Text('Tähän muhlun data:')],
         [sg.Text('Nimi', size=(15,1)), sg.InputText(key='Nimi')],
-        [sg.Text('Player power', size=(15,1)), sg.InputText(key='Player Power', size=(10))],
+        [sg.Text('Player power', size=(15,1)), sg.InputText(key='Player power', size=(10))],
         [sg.Text('Clan XP', size=(15,1)), sg.InputText(key='Clan XP', size=(10))],
         [sg.Text('Arena rankki', size=(15,1)), sg.Combo(rankit, key='Arena rankki')],
         [sg.Text('Pvm', size=(15,1)), sg.InputText(today.strftime('%d/%m/%Y'),key='Pvm',disabled=True, size=(10))],
@@ -80,6 +80,12 @@ def clear_input(window, values):
         window[key]('')
     return None
 
+def write_json(data, file=JSON_FILE):
+    with open (file, 'w') as f:
+        json.dump(data, f, indent=4)
+    f.close()
+
+
 alku, UDP, CB, Pelaajat = alkuIkkuna(), None, None, None
 
 while True:
@@ -101,13 +107,15 @@ while True:
                 clear_input(UDP,values2)
             
             if event2 == 'Submit':
-                df = pd.read_excel(EXCEL_FILE, sheet_name='Klaani')
-                print (df)
-                df = df.append(values2, ignore_index=True)
-                with pd.ExcelWriter(EXCEL_FILE, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-                    df.to_excel(writer, sheet_name='Klaani', index=False)
-                clear_input(UDP, values2)
+                with open(JSON_FILE) as json_file:
+                    data = json.load(json_file)
+                    temp = data['Klaani']
+                    temp.append(values2)
+                json_file.close()
 
+                write_json(data)
+                
+                clear_input(UDP,values2)
 
             
         UDP.close()
@@ -126,10 +134,14 @@ while True:
                 clear_input(CB,values3)
             
             if event3 == 'Submit':
-                df = pd.read_excel(EXCEL_FILE, sheet_name='CB')
-                df = df.append(values3, ignore_index=True)
-                with pd.ExcelWriter(EXCEL_FILE, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-                    df.to_excel(writer, sheet_name='CB', index=False)
+                with open(JSON_FILE) as json_file:
+                    data = json.load(json_file)
+                    temp = data['CB']
+                    temp.append(values3)
+                json_file.close()
+
+                write_json(data)
+                
                 clear_input(CB,values3)
 
         CB.close()
@@ -147,18 +159,34 @@ while True:
                 clear_input(Pelaajat,values4)
             
             if event4 == 'Submit':
-                pvm1 = values4['pvm1']
-                pvm2 = values4['pvm2']
-                
-                i = -1
-                a = []
-                b = json.loads(jsonData)
-                for x in pd.read_excel(EXCEL_FILE, sheet_name='Klaani').Pvm:
-                    i = i + 1
-                    if x == pvm1 or x == pvm2:
-                        a.append(b['Nimi'])
-                
-                print (a)
+                if values4['pvm1']<values4['pvm2']:
+                    pvm1 = values4['pvm1']
+                    pvm2 = values4['pvm2']
+                else:
+                    pvm1 = values4['pvm2']
+                    pvm2 = values4['pvm1']
+
+                match values4['kohde']:
+                    case 'Player power':
+                        with open(JSON_FILE) as f:
+                            for x in json.load(f)['Klaani']:
+                                if x['Pvm'] == pvm1:
+                                    data1 = x
+                                if x['Pvm'] == pvm2:
+                                    data2 = x
+                            f.close()
+                        print(data1,data2)
+                        sg.popup('Player power muutos: ', int(data2['Player power'])-int(data1['Player ower']))
+                        
+                    case 'Clan XP':
+                        with open(JSON_FILE) as f:
+                            for x in json.load(f)['Klaani']:
+                                if x['Pvm'] == pvm1:
+                                    data1 = x
+                                if x['Pvm'] == pvm2:
+                                    data2 = x
+                            f.close()
+                        sg.popup('Clan XP muutos: ', int(data2['Clan XP'])-int(data1['Clan XP']))
 
         Pelaajat.close()
         
